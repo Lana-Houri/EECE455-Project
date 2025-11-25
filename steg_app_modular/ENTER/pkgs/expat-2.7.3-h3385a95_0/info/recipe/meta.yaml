@@ -1,0 +1,75 @@
+# This file created by conda-build 25.1.2
+# meta.yaml template originally from:
+# /home/task_176226747433272/expat-feedstock/recipe, last modified Tue Nov  4 14:44:52 2025
+# ------------------------------------------------
+
+package:
+  name: expat
+  version: 2.7.3
+source:
+  sha256: 59c31441fec9a66205307749eccfee551055f2d792f329f18d97099e919a3b2f
+  url: https://github.com/libexpat/libexpat/releases/download/R_2_7_3/expat-2.7.3.tar.bz2
+build:
+  number: '0'
+  run_exports:
+    - expat >=2.7.3,<3.0a0
+  string: h3385a95_0
+requirements:
+  build:
+    - _libgcc_mutex 0.1 main
+    - _openmp_mutex 5.1 1_gnu
+    - binutils_impl_linux-64 2.40 h5293946_0
+    - binutils_linux-64 2.40.0 hc2dff05_2
+    - gcc_impl_linux-64 11.2.0 h1234567_1
+    - gcc_linux-64 11.2.0 h5c386dc_2
+    - gxx_impl_linux-64 11.2.0 h1234567_1
+    - gxx_linux-64 11.2.0 hc2dff05_2
+    - kernel-headers_linux-64 4.18.0 h528b178_0
+    - ld_impl_linux-64 2.40 h12ee557_0
+    - libgcc-devel_linux-64 11.2.0 h1234567_1
+    - libgcc-ng 11.2.0 h1234567_1
+    - libgomp 11.2.0 h1234567_1
+    - libstdcxx-devel_linux-64 11.2.0 h1234567_1
+    - libstdcxx-ng 11.2.0 h1234567_1
+    - libtool 2.4.7 h6a678d5_0
+    - make 4.2.1 h1bed415_1
+    - sysroot_linux-64 2.28 h528b178_0
+    - tzdata 2025b h04d1e81_0
+  host:
+    - _libgcc_mutex 0.1 main
+    - _openmp_mutex 5.1 1_gnu
+    - libgcc-ng 11.2.0 h1234567_1
+    - libgomp 11.2.0 h1234567_1
+    - libstdcxx-ng 11.2.0 h1234567_1
+  run:
+    - __glibc >=2.28,<3.0.a0
+    - libgcc-ng >=11.2.0
+    - libstdcxx-ng >=11.2.0
+test:
+  commands:
+    - xmlwf -h
+about:
+  description: 'Expat is a stream-oriented XML parser library written in C.
+
+    Expat excels with files too large to fit RAM, and where performance
+
+    and flexibility are crucial.
+
+    '
+  dev_url: https://github.com/libexpat/libexpat
+  doc_url: https://libexpat.github.io/doc/
+  home: https://libexpat.github.io
+  license: MIT
+  license_family: MIT
+  license_file: COPYING
+  summary: Expat XML parser library in C
+extra:
+  copy_test_source_files: true
+  final: true
+  recipe-maintainers:
+    - kwilcox
+    - mingwandroid
+    - msarahan
+    - ocefpaf
+    - pelson
+    - scopatz

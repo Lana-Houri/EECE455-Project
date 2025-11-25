@@ -1,0 +1,5 @@
+#!/home/task_176107353002222/conda-bld/python-split_1761073632527/_h_env_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_placehold_plac/bin/python3.13
+
+from idlelib.pyshell import main
+if __name__ == '__main__':
+    main()

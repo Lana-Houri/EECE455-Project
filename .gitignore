@@ -1,0 +1,62 @@
+# -------------------------
+# PYTHON / STREAMLIT PROJECT
+# -------------------------
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.venv/
+env/
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+.DS_Store
+
+# Streamlit cache
+.streamlit/
+**/.streamlit/
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# -------------------------
+# PROJECT-SPECIFIC IGNORE
+# -------------------------
+
+# Ignore the entire Aletheia directory
+aletheia/
+aletheia/*
+
+# Ignore Aletheia models if stored elsewhere
+models/
+*.h5
+*.ckpt
+
+# Ignore uploaded images or temp files
+uploads/
+temp/
+tmp/
+*.png
+*.jpg
+*.jpeg
+
+# Ignore local config files
+config.json
+secret.json
+
+# Any personal environment file
+*.env

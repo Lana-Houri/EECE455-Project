@@ -1,0 +1,13 @@
+prefix=/home/amarus/ver4/steg_app_modular/ENTER
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+modules=1
+
+Name: libXML
+Version: 2.13.9
+Description: libXML library version2.
+Requires.private:  icu-i18n
+Libs: -L${libdir} -lxml2 
+Libs.private:  -L/home/amarus/ver4/steg_app_modular/ENTER/lib -lz -L/home/amarus/ver4/steg_app_modular/ENTER/lib -llzma  -L/home/amarus/ver4/steg_app_modular/ENTER/lib  -lm   
+Cflags: -I${includedir}/libxml2 -I/home/amarus/ver4/steg_app_modular/ENTER/include 
