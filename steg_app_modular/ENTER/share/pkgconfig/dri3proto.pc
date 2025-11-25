@@ -1,7 +1,0 @@
-prefix=/home/amarus/ver4/steg_app_modular/ENTER
-includedir=${prefix}/include
- 
-Name: DRI3Proto
-Description: DRI3 extension headers
-Version: 1.4
-Cflags: -I${includedir}

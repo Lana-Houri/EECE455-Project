@@ -40,6 +40,8 @@ Desktop.ini
 # Ignore the entire Aletheia directory
 aletheia/
 aletheia/*
+ENTER/
+ENTER/*
 
 # Ignore Aletheia models if stored elsewhere
 models/
