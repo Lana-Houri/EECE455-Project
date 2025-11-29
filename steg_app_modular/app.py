@@ -1271,6 +1271,12 @@ st.markdown(
 # =====================================
 # Imports from modules
 # =====================================
+from auth import (
+    is_authenticated, 
+    get_current_username, 
+    show_login_page, 
+    logout
+)
 from statistical_tools import (
     run_stegexpose, 
     run_deep_steganalysis, 
@@ -1284,6 +1290,19 @@ from external_tools import run_exiftool, run_binwalk, check_trailer_manual
 from parsers import (is_printable_text, calculate_entropy, is_error_or_status_message, classify_result, parse_tool_output)
 from decode_tools import (run_zsteg, run_outguess, run_openstego, run_steghide, run_jsteg, run_f5)
 from encode_tools import encode_openstego, encode_steghide
+
+# =====================================
+# Authentication Check
+# =====================================
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+if 'username' not in st.session_state:
+    st.session_state.username = ""
+
+# Check authentication - show login page if not authenticated
+if not is_authenticated():
+    show_login_page()
+    st.stop()  # Stop execution here if not authenticated
 
 # =====================================
 # Session State Management
@@ -1307,7 +1326,54 @@ def send_to_gemini(message: str, api_key: str):
         import google.generativeai as genai
         
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-pro')
+        
+        # Try to list available models first, then use a compatible one
+        model = None
+        last_error = None
+        
+        try:
+            # First, try to list available models to see what's actually available
+            available_models = genai.list_models()
+            model_names = [m.name for m in available_models if 'generateContent' in m.supported_generation_methods]
+            
+            # Prefer free models: flash is faster and free
+            preferred_models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
+            
+            for preferred in preferred_models:
+                for full_model_name in model_names:
+                    # Extract just the model name (e.g., "models/gemini-1.5-flash" -> "gemini-1.5-flash")
+                    model_name = full_model_name.split('/')[-1] if '/' in full_model_name else full_model_name
+                    if preferred in model_name.lower():
+                        try:
+                            model = genai.GenerativeModel(model_name)
+                            break
+                        except:
+                            continue
+                if model:
+                    break
+        except Exception as e:
+            # If listing models fails, try common model names directly
+            last_error = e
+            pass
+        
+        # If no model found from listing, try direct model names
+        if model is None:
+            model_names_to_try = [
+                'gemini-1.5-flash',
+                'gemini-1.5-pro', 
+                'gemini-pro',
+            ]
+            
+            for model_name in model_names_to_try:
+                try:
+                    model = genai.GenerativeModel(model_name)
+                    break
+                except Exception as e2:
+                    last_error = e2
+                    continue
+        
+        if model is None:
+            return f"Error: Could not connect to any Gemini model. Please verify your API key is correct and you have access to Gemini models. Error: {str(last_error)}"
         
         system_prompt = """You are a helpful assistant specializing in steganography and cryptography concepts. 
         You help users understand:
@@ -1337,6 +1403,12 @@ with st.sidebar:
             <div class="sidebar-logo-text">StegAnalyzer</div>
         </div>
     """, unsafe_allow_html=True)
+    
+    # User info
+    st.markdown("---")
+    username = get_current_username()
+    st.markdown(f"**👤 Logged in as:** `{username}`")
+    st.markdown("---")
     
     st.markdown("### Navigation")
     
@@ -1381,6 +1453,12 @@ with st.sidebar:
     if st.button("Chat", key="nav_Chat", use_container_width=True):
         st.session_state.current_page = 'Chat'
         st.rerun()
+    
+    # Logout button at the bottom
+    st.markdown("---")
+    st.markdown("---")
+    if st.button("🚪 Logout", use_container_width=True, key="logout_btn"):
+        logout()
 
 # =====================================
 # Header
