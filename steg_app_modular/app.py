@@ -11,6 +11,13 @@ from collections import Counter
 from PIL import Image
 
 # =====================================
+# Gemini API Configuration
+# =====================================
+# TODO: Replace "YOUR_GEMINI_API_KEY_HERE" below with your actual Gemini API key
+# Get your free API key from: https://makersuite.google.com/app/apikey
+GEMINI_API_KEY = "AIzaSyA_bZnlL9RYCd37WatQAuRru-XFwBVjSu8"
+
+# =====================================
 # Page Configuration
 # =====================================
 st.set_page_config(
@@ -1311,16 +1318,18 @@ if 'current_page' not in st.session_state:
     st.session_state.current_page = 'Analyze'
 if 'chat_messages' not in st.session_state:
     st.session_state.chat_messages = []
-if 'gemini_api_key' not in st.session_state:
-    st.session_state.gemini_api_key = ""
 
 # =====================================
 # Gemini Chatbot Helper Function
 # =====================================
-def send_to_gemini(message: str, api_key: str):
+def send_to_gemini(message: str, api_key: str = None):
     """Send message to Gemini API for cryptography help."""
-    if not api_key:
-        return "Please set your Gemini API key in the sidebar first."
+    # Use hardcoded API key if not provided
+    if api_key is None:
+        api_key = GEMINI_API_KEY
+    
+    if not api_key or api_key == "YOUR_GEMINI_API_KEY_HERE":
+        return "Error: Gemini API key not configured. Please set GEMINI_API_KEY in the code or as an environment variable."
     
     try:
         import google.generativeai as genai
@@ -1427,12 +1436,6 @@ with st.sidebar:
     if st.button("ℹ️ About", key="nav_About", use_container_width=True):
         st.session_state.current_page = 'About'
         st.rerun()
-    
-    st.markdown("---")
-    st.markdown("### Gemini API Key")
-    api_key_input = st.text_input("Enter API Key", type="password", value=st.session_state.gemini_api_key, key="api_key_input")
-    if api_key_input != st.session_state.gemini_api_key:
-        st.session_state.gemini_api_key = api_key_input
     
     st.markdown("---")
     st.markdown("### 🛠️ Detection Methods")
@@ -2090,21 +2093,10 @@ elif current_page == 'Chat':
         <div class="alert-box alert-info">
             <span class="alert-icon">i</span>
             <div>
-                <strong>AI Assistant:</strong> Ask me about steganography techniques, cryptographic concepts, or how to interpret analysis results. 
-                Make sure to set your Gemini API key in the sidebar first.
+                <strong>AI Assistant:</strong> Ask me about steganography techniques, cryptographic concepts, or how to interpret analysis results.
             </div>
         </div>
     """, unsafe_allow_html=True)
-    
-    if not st.session_state.gemini_api_key:
-        st.markdown("""
-            <div class="alert-box alert-medium">
-                <span class="alert-icon">⚠</span>
-                <div>
-                    <strong>API Key Required:</strong> Please enter your Gemini API key in the sidebar to use the chatbot.
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
     
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown("### 🤖 Chat with AI Assistant")
@@ -2135,13 +2127,10 @@ elif current_page == 'Chat':
     with col1:
         if st.button("Send", key="send_chat", use_container_width=True):
             if user_message:
-                if not st.session_state.gemini_api_key:
-                    st.error("Please set your Gemini API key in the sidebar first.")
-                else:
-                    st.session_state.chat_messages.append({"role": "user", "content": user_message})
-                    response = send_to_gemini(user_message, st.session_state.gemini_api_key)
-                    st.session_state.chat_messages.append({"role": "assistant", "content": response})
-                    st.rerun()
+                st.session_state.chat_messages.append({"role": "user", "content": user_message})
+                response = send_to_gemini(user_message)
+                st.session_state.chat_messages.append({"role": "assistant", "content": response})
+                st.rerun()
     with col2:
         if st.button("Clear", key="clear_chat", use_container_width=True):
             st.session_state.chat_messages = []
