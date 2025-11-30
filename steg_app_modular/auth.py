@@ -98,112 +98,21 @@ def show_login_page():
 
     if 'auth_page_mode' not in st.session_state:
         st.session_state.auth_page_mode = 'login'
+    if 'auth_notices' not in st.session_state:
+        st.session_state.auth_notices = []
 
-    # Inject CSS
-    st.markdown("""
-        <style>
-        /* Hide default Streamlit elements */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
-
-        .stApp { background-color: #0d1117 !important; }
-
-        /* HEADER */
-        .auth-logo {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #58a6ff;
-            padding-top: 10px;
-        }
-
-        /* SMALLER TOP BUTTONS */
-        .stButton > button[key="header_register_btn"],
-        .stButton > button[key="header_login_btn"] {
-            padding: 0.3rem 0.8rem !important;
-            font-size: 0.85rem !important;
-            min-height: 0px !important;
-            border-radius: 5px !important;
-            background: #1c2128 !important;
-            border: 1px solid #30363d !important;
-            color: white !important;
-        }
-
-        .stButton > button[key="header_register_btn"]:hover,
-        .stButton > button[key="header_login_btn"]:hover {
-            border-color: #58a6ff !important;
-            color: #58a6ff !important;
-        }
-
-        .auth-main-content {
-            display: flex;
-            justify-content: center;
-            padding-top: 40px;
-        }
-
-        .auth-form-wrapper {
-            width: 100%;
-            max-width: 430px;
-            background: #1c2128;
-            padding: 2.2rem;
-            border-radius: 12px;
-            border: 1px solid #30363d;
-        }
-
-        .auth-title {
-            text-align: center;
-            color: white;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        /* INPUTS */
-        .stTextInput > div > div > input {
-            background-color: #161b22 !important;
-            border: 1px solid #30363d !important;
-            color: white !important;
-            border-radius: 6px !important;
-            transition: border-color 0.2s ease !important;
-        }
-
-        .stTextInput > div > div > input:focus {
-            border-color: #58a6ff !important;
-            outline: none !important;
-            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2) !important;
-        }
-
-        /* BOTTOM BUTTONS — NOW BLUE */
-        .stButton > button:not([key^="header"]) {
-            width: 100%;
-            background: #58a6ff !important;
-            color: white !important;
-            border-radius: 6px !important;
-            padding: 0.7rem !important;
-            font-size: 1rem !important;
-            border: none !important;
-        }
-
-        .stButton > button:not([key^="header"]):hover {
-            background: #4a9eff !important;
-            box-shadow: 0 3px 10px rgba(88, 166, 255, 0.3);
-        }
-        
-        /* Center the form submit button */
-        form .stButton {
-            display: flex;
-            justify-content: center;
-        }
-        
-        form .stButton > button {
-            margin: 0 auto;
-        }
-        </style>
-    """, unsafe_allow_html=True)
+    def _notify(message: str, success: bool = True):
+        icon = "✅" if success else "⚠️"
+        st.session_state.auth_notices.append((message, success, icon))
+        try:
+            st.toast(message, icon=icon)
+        except Exception:
+            pass
 
     # Header
     col1, col2 = st.columns([3, 1])
     with col1:
-        st.markdown('<div class="auth-logo">🔐 StegAnalyzer</div>', unsafe_allow_html=True)
+        st.markdown("### 🔐 StegAnalyzer")
     with col2:
         if st.session_state.auth_page_mode == "login":
             if st.button("Register", key="header_register_btn"):
@@ -214,12 +123,21 @@ def show_login_page():
                 st.session_state.auth_page_mode = 'login'
                 st.rerun()
 
-    st.markdown("---")
+    if st.session_state.auth_notices:
+        for msg, success, icon in st.session_state.auth_notices[-3:]:
+            tone = "auth-toast-success" if success else "auth-toast-error"
+            st.markdown(f"""
+                <div class="card" style="background: rgba(15,23,42,0.6); border-left: 4px solid {'#10b981' if success else '#f97316'}; margin-top: 0.5rem;">
+                    <strong>{icon} {msg}</strong>
+                </div>
+            """, unsafe_allow_html=True)
+        st.session_state.auth_notices.clear()
 
     col_left, col_center, col_right = st.columns([1, 2, 1])
     with col_center:
+        st.markdown('<div class="card" style="padding:2rem;">', unsafe_allow_html=True)
         if st.session_state.auth_page_mode == "register":
-            st.markdown('<h1 class="auth-title">Create New Account</h1>', unsafe_allow_html=True)
+            st.markdown("#### Create New Account")
             with st.form("register_form"):
                 u = st.text_input("Username")
                 e = st.text_input("Email (optional)")
@@ -230,12 +148,18 @@ def show_login_page():
                 if s:
                     if p != c:
                         st.error("Passwords do not match")
+                        _notify("Passwords do not match", success=False)
                     else:
                         ok, msg = register_user(u, p, e)
-                        st.success(msg) if ok else st.error(msg)
+                        if ok:
+                            st.success(msg)
+                            _notify("Registration successful! Welcome aboard.", success=True)
+                        else:
+                            st.error(msg)
+                            _notify(msg, success=False)
 
         else:
-            st.markdown('<h1 class="auth-title">Login to StegAnalyzer</h1>', unsafe_allow_html=True)
+            st.markdown("#### Login to StegAnalyzer")
             with st.form("login_form"):
                 u = st.text_input("Username")
                 p = st.text_input("Password", type="password")
@@ -247,9 +171,12 @@ def show_login_page():
                         st.session_state.authenticated = True
                         st.session_state.username = u
                         st.success(msg)
+                        _notify(f"Welcome back, {u}!", success=True)
                         st.rerun()
                     else:
                         st.error(msg)
+                        _notify(msg, success=False)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 def require_auth(func):
     def wrapper(*args, **kwargs):
