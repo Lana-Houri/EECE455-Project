@@ -34,6 +34,7 @@ from decode_page import render_decode_page
 from encode_page import render_encode_page
 from text_page import render_text_page
 from automation_page import render_automation_page
+from image_in_image_page import render_image_in_image_page
 
 # =====================================
 # Page Theme
@@ -183,12 +184,7 @@ elif current_page == 'Text in Image':
 elif current_page == 'Text Steg':
     render_text_page()
 elif current_page == 'Image in Image':
-    st.markdown('<h2 class="section-header">🧩 Image-in-Image Steg Lab</h2>', unsafe_allow_html=True)
-    st.markdown("""
-        <div class="card">
-            <p>Image-in-image workflows are under construction. Soon you'll be able to detect and extract nested visuals here.</p>
-        </div>
-    """, unsafe_allow_html=True)
+    render_image_in_image_page()
 
 # =====================================
 # CHAT PAGE
