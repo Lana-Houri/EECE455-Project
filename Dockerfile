@@ -1,22 +1,22 @@
-# Use an official Python image
-FROM python:3.11-slim
+# Use Ubuntu base so we can install all stego tools
+FROM ubuntu:22.04
 
-# Install system tools and build dependencies
+# Prevent interactive prompts during install
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
 RUN apt-get update && \
     apt-get install -y \
+        python3 python3-pip python3-venv \
         steghide \
         exiftool \
         ruby ruby-dev \
         build-essential \
         openjdk-11-jre \
-        default-jre \
-        wget \
-        unzip \
-        git \
-        autoconf automake libtool \
-        make gcc && \
-    gem install zsteg && \
-    apt-get clean
+        wget unzip git \
+        autoconf automake libtool make gcc \
+        golang-go && \
+    gem install zsteg
 
 # Install OutGuess
 RUN git clone https://github.com/crorvick/outguess.git /tmp/outguess && \
@@ -43,7 +43,7 @@ RUN wget https://github.com/syvaidya/opensteg/releases/download/0.8.2/openstego-
     chmod +x /opt/openstego/bin/openstego && \
     ln -s /opt/openstego/bin/openstego /usr/local/bin/openstego
 
-# Set working directory
+# Create app directory
 WORKDIR /app
 
 # Copy project files
@@ -52,8 +52,8 @@ COPY . /app
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port for Streamlit
+# Expose Streamlit port
 EXPOSE 10000
 
-# Start Streamlit
+# Run Streamlit
 CMD ["streamlit", "run", "app.py", "--server.port=10000", "--server.address=0.0.0.0"]
