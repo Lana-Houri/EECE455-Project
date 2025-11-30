@@ -50,19 +50,25 @@ def render_text_page():
     method_options = ["zwsp-py", "pyUnicode", "zwsteg-cli"]
     available_text_methods = text_available_methods()
     
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown("#### ⚙️ Encoder Availability")
+    availability_rows = []
     for method in method_options:
         if method in available_text_methods:
-            st.markdown(f"- ✅ **{method}** ready")
+            availability_rows.append(f"<li>✅ <strong>{method}</strong> ready</li>")
         else:
-            st.markdown(f"- ⚠️ **{method}** requires optional dependency")
-    st.markdown('</div>', unsafe_allow_html=True)
+            availability_rows.append(f"<li>⚠️ <strong>{method}</strong> requires optional dependency</li>")
+    st.markdown(
+        f"""
+        <div class="card">
+            <h4>⚙️ Encoder Availability</h4>
+            <ul>{''.join(availability_rows)}</ul>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     
     encode_col, analyze_col = st.columns(2)
     
     with encode_col:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown("#### ✍️ Encode Secret")
         cover_text = st.text_area(
             "",
@@ -111,10 +117,8 @@ def render_text_page():
                     st.error(f"Dependency missing: {exc}")
                 except Exception as exc:
                     st.error(f"Encoding failed: {exc}")
-        st.markdown('</div>', unsafe_allow_html=True)
     
     with analyze_col:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown("#### 🧪 Analyze / Decode Text")
         suspect_text = st.text_area(
             "",
@@ -139,4 +143,3 @@ def render_text_page():
                         st.code(payload, language="text")
                 else:
                     st.info("No payloads recovered with the currently installed decoders.")
-        st.markdown('</div>', unsafe_allow_html=True)

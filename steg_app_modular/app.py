@@ -315,8 +315,8 @@ elif current_page == 'About':
     st.markdown("**DCT Analysis:**")
     st.markdown("Examines JPEG DCT coefficients. F5 steganography causes 'shrinkage' (more zeros).")
     
-    st.markdown("**Deep Learning (SRNet):**")
-    st.markdown("12-layer residual CNN that learns steganographic artifacts. Best for J-UNIWARD, nsF5, UERD.")
+    st.markdown("**Deep Learning:**")
+    st.markdown("Neural detectors trained on multiple datasets to capture subtle embedding artifacts across formats.")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =====================================

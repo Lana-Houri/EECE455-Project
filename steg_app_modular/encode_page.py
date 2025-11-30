@@ -21,18 +21,13 @@ def render_encode_page():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown("#### 📷 Upload Cover Image")
         cover_image = st.file_uploader("Cover image", type=["png", "jpg", "jpeg"], key="encode_cover")
-        st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown("#### 📝 Secret Data")
         secret_data = st.text_area("Enter secret message", height=150, placeholder="Type your secret message here...")
-        st.markdown('</div>', unsafe_allow_html=True)
     
-    st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown("#### ⚙️ Encoding Settings")
     
     col1, col2 = st.columns(2)
@@ -40,8 +35,6 @@ def render_encode_page():
         encoding_method = st.selectbox("Encoding method", ["Steghide", "OpenStego"])
     with col2:
         encode_password = st.text_input("Password (optional)", type="password", key="encode_password")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
     
     if not (cover_image and secret_data):
         return

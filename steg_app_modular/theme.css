@@ -102,6 +102,26 @@
         border-radius: 10px !important;
         transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
       }
+
+      .stTextInput input::placeholder,
+      .stTextInput input::-webkit-input-placeholder,
+      .stTextInput input::-moz-placeholder,
+      .stTextInput input:-ms-input-placeholder,
+      .stTextArea textarea::placeholder,
+      .stTextArea textarea::-webkit-input-placeholder,
+      .stTextArea textarea::-moz-placeholder,
+      .stTextArea textarea:-ms-input-placeholder,
+      textarea::placeholder,
+      textarea::-webkit-input-placeholder,
+      textarea::-moz-placeholder,
+      textarea:-ms-input-placeholder,
+      input::placeholder,
+      input::-webkit-input-placeholder,
+      input::-moz-placeholder,
+      input:-ms-input-placeholder {
+        color: var(--text-tertiary) !important;
+        opacity: 1 !important;
+      }
       
       .stTextInput > div > div > input:focus,
       .stPasswordInput > div > div > input:focus,
@@ -321,6 +341,10 @@
         box-shadow: var(--shadow-md);
         margin-bottom: 1rem;
         color: var(--text-primary) !important;
+      }
+
+      .card:empty {
+        display: none !important;
       }
       
       .card p, .card div, .card span, .card h1, .card h2, .card h3, .card h4 {

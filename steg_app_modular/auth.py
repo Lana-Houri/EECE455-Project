@@ -93,6 +93,7 @@ def logout():
     st.session_state.username = ""
     st.rerun()
 
+
 def show_login_page():
     """Display login/register page with improved UI."""
 
@@ -102,347 +103,278 @@ def show_login_page():
         st.session_state.auth_notices = []
 
     def _notify(message: str, success: bool = True):
-        icon = "✓" if success else "✗"
-        st.session_state.auth_notices.append((message, success, icon))
+        st.session_state.auth_notices.append((message, success))
         try:
-            st.toast(message, icon=icon)
+            st.toast(message)
         except Exception:
             pass
 
-    # Custom CSS for auth page
     st.markdown("""
         <style>
-        .auth-container {
-            max-width: 450px;
-            margin: 2rem auto;
+        .auth-shell {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 1.5rem 0 3rem;
         }
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
+        .auth-hero {
+            position: relative;
+            padding: 2.25rem 2.5rem;
+            border-radius: 18px;
+            border: 1px solid rgba(88, 166, 255, 0.35);
+            background: radial-gradient(circle at 20% 20%, rgba(88, 166, 255, 0.18), transparent 50%),
+                        linear-gradient(135deg, rgba(88,166,255,0.06), rgba(63,185,80,0.05));
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            animation: floatIn 0.6s ease forwards;
         }
-        .auth-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #58a6ff 0%, #3fb950 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .auth-hero .eyebrow {
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-bottom: 0.85rem;
         }
-        .auth-form-card {
-            background: var(--bg-card);
+        .auth-hero h1 {
+            font-size: 2.35rem;
+            margin: 0;
+            color: var(--text-primary);
+            position: relative;
+            z-index: 1;
+        }
+        .auth-hero p {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        .auth-intro {
+            margin-top: 1.5rem;
+        }
+        .auth-tabs {
+            margin-top: 1.5rem;
+        }
+        .auth-tabs [data-baseweb="tab-list"] {
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .auth-tabs [data-baseweb="tab-list"] button {
+            border-radius: 999px;
+            border: 1px solid transparent;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            padding: 0.45rem 1.35rem;
+            transition: all 0.2s ease;
+        }
+        .auth-tabs [data-baseweb="tab-list"] button[aria-selected="true"] {
+            color: var(--text-primary);
+            border-color: rgba(88, 166, 255, 0.45);
+            background: rgba(88, 166, 255, 0.12);
+            box-shadow: 0 0 18px rgba(88, 166, 255, 0.15);
+        }
+        .auth-shell div[data-testid="stForm"] {
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2.5rem;
+            border-radius: 16px;
+            padding: 2.25rem;
             box-shadow: var(--shadow-lg);
+            margin-top: 1.25rem;
+            animation: fadeUp 0.35s ease forwards;
+        }
+        .auth-shell div[data-testid="stForm"] h3 {
+            margin-bottom: 0.35rem;
+        }
+        .auth-shell div[data-testid="stForm"] p {
+            color: var(--text-tertiary);
+            margin-bottom: 1.5rem;
+        }
+        .help-text {
+            color: var(--text-tertiary);
+            margin-bottom: 1.5rem;
         }
         .auth-message {
-            padding: 1rem;
-            border-radius: 8px;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.75);
             margin-bottom: 1rem;
-            border-left: 4px solid;
-            animation: slideIn 0.3s ease-out;
+            animation: fadeUp 0.3s ease forwards;
+        }
+        .auth-message .status-dot {
+            width: 0.65rem;
+            height: 0.65rem;
+            border-radius: 999px;
+            margin-top: 0.2rem;
+            flex-shrink: 0;
+            background: var(--accent-info);
+            box-shadow: 0 0 12px rgba(88, 166, 255, 0.45);
         }
         .auth-message.success {
-            background: rgba(63, 185, 80, 0.1);
-            border-left-color: var(--accent-success);
-            color: var(--accent-success);
+            border-color: rgba(63, 185, 80, 0.4);
+            background: rgba(63, 185, 80, 0.08);
+        }
+        .auth-message.success .status-dot {
+            background: var(--accent-success);
+            box-shadow: 0 0 12px rgba(63, 185, 80, 0.5);
         }
         .auth-message.error {
-            background: rgba(248, 81, 73, 0.1);
-            border-left-color: var(--accent-error);
-            color: var(--accent-error);
+            border-color: rgba(248, 81, 73, 0.4);
+            background: rgba(248, 81, 73, 0.08);
         }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .auth-message.error .status-dot {
+            background: var(--accent-error);
+            box-shadow: 0 0 12px rgba(248, 81, 73, 0.5);
         }
         .auth-footer {
             text-align: center;
-            margin-top: 2rem;
+            margin-top: 2.5rem;
             color: var(--text-tertiary);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
-        /* Hide empty Streamlit containers */
-        .element-container:empty,
-        div[data-testid="stVerticalBlock"]:empty {
-            display: none !important;
+        @keyframes floatIn {
+            from {opacity: 0; transform: translateY(-10px);}
+            to {opacity: 1; transform: translateY(0);}
         }
-        /* Ensure auth message only shows when content exists */
-        .auth-message:empty {
-            display: none !important;
-        }
-        /* Remove empty tab container spacing */
-        section[data-testid="stTabs"] {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        section[data-testid="stTabs"] > div {
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        /* Remove padding from tab panels */
-        div[role="tabpanel"] {
-            padding-top: 1rem !important;
-        }
-        /* Hide empty column containers */
-        div[data-testid="column"] {
-            padding: 0 !important;
-        }
-        /* Remove gap between header and tabs */
-        .auth-header {
-            margin-bottom: 1.5rem !important;
-        }
-        /* COMPLETELY REMOVE ALL RED BORDERS - Only blue border */
-        .stTextInput,
-        .stPasswordInput,
-        .stTextInput > div,
-        .stPasswordInput > div,
-        .stTextInput > div > div,
-        .stPasswordInput > div > div,
-        .stTextInput > div > div > div,
-        .stPasswordInput > div > div > div {
-            border: none !important;
-            box-shadow: none !important;
-            outline: none !important;
-        }
-        /* Remove red borders from all nested elements */
-        .stTextInput *,
-        .stPasswordInput * {
-            border-color: transparent !important;
-            box-shadow: none !important;
-        }
-        /* Input field - only blue border - same size for both */
-        .stTextInput > div > div > input,
-        .stPasswordInput > div > div > input {
-            border: 1px solid rgba(88, 166, 255, 0.35) !important;
-            outline: none !important;
-            box-shadow: none !important;
-            width: 100% !important;
-            height: 2.5rem !important;
-            padding: 0.5rem 0.75rem !important;
-            box-sizing: border-box !important;
-        }
-        /* Ensure containers have same width and layout */
-        .stTextInput,
-        .stPasswordInput {
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-        }
-        .stTextInput > div,
-        .stPasswordInput > div {
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-        }
-        .stTextInput > div > div,
-        .stPasswordInput > div > div {
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-        /* Make password input wrapper match username width */
-        .stPasswordInput > div > div {
-            position: relative !important;
-        }
-        /* Force both inputs to exact same container width */
-        .stTextInput > div > div,
-        .stPasswordInput > div > div {
-            max-width: 100% !important;
-            flex: 1 1 100% !important;
-        }
-        /* Adjust password input to account for eye icon */
-        .stPasswordInput > div > div > input {
-            padding-right: 2.5rem !important;
-            flex: 1 !important;
-        }
-        /* Make username input match the same visual width */
-        .stTextInput > div > div > input {
-            padding-right: 0.75rem !important;
-            flex: 1 !important;
-        }
-        /* Ensure both form elements take same space */
-        form .stTextInput,
-        form .stPasswordInput {
-            flex: 1 1 auto !important;
-            width: 100% !important;
-        }
-        /* Input field on focus - single blue border only */
-        .stTextInput > div > div > input:focus,
-        .stTextInput > div > div > input:focus-visible,
-        .stPasswordInput > div > div > input:focus,
-        .stPasswordInput > div > div > input:focus-visible {
-            border: 2px solid #58a6ff !important;
-            outline: none !important;
-            box-shadow: none !important;
-        }
-        /* Remove any red error states */
-        .stTextInput > div > div > input:invalid,
-        .stPasswordInput > div > div > input:invalid {
-            border-color: #58a6ff !important;
-            outline: none !important;
-            box-shadow: none !important;
-        }
-        /* Remove borders from button/icon containers */
-        .stTextInput button,
-        .stPasswordInput button,
-        .stTextInput [data-baseweb="button"],
-        .stPasswordInput [data-baseweb="button"] {
-            border: none !important;
-            outline: none !important;
-            box-shadow: none !important;
+        @keyframes fadeUp {
+            from {opacity: 0; transform: translateY(12px);}
+            to {opacity: 1; transform: translateY(0);}
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # Centered container
-    col_left, col_center, col_right = st.columns([1, 1.2, 1])
-    
-    with col_center:
-        # Header
-        st.markdown("""
-            <div class="auth-header">
-                <h1>🔐 StegAnalyzer</h1>
-                <p style="color: var(--text-tertiary); margin-top: 0.5rem;">
-                    Advanced Steganography Detection & Analysis Platform
-                </p>
+    st.markdown('<div class="auth-shell">', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="auth-hero">
+            <p class="eyebrow">Secure Access</p>
+            <h1>StegAnalyzer</h1>
+            <p>Advanced Steganography Detection & Analysis Platform</p>
+        </div>
+    """, unsafe_allow_html=True)
+    st.markdown("""
+        <div class="alert-box alert-info auth-intro">
+            <span class="alert-icon">i</span>
+            <div>
+                <strong>Encrypted workspace:</strong> Sign in to orchestrate encoders, launch detectors, and continue your investigations.
             </div>
-        """, unsafe_allow_html=True)
+        </div>
+    """, unsafe_allow_html=True)
 
-        # Tabs
-        tab1, tab2 = st.tabs(["🔑 Login", "📝 Register"])
+    st.markdown('<div class="auth-tabs">', unsafe_allow_html=True)
+    tab1, tab2 = st.tabs(["Login", "Register"])
+    st.markdown('</div>', unsafe_allow_html=True)
 
-        # Login Tab
-        with tab1:
-            # Display notifications
-            if st.session_state.auth_notices:
-                for msg, success, icon in st.session_state.auth_notices[-1:]:  # Show only latest
-                    msg_class = "success" if success else "error"
-                    st.markdown(f"""
-                        <div class="auth-message {msg_class}">
-                            <strong>{icon}</strong> {msg}
-                        </div>
-                    """, unsafe_allow_html=True)
-                # Keep only the latest 3 notifications
-                st.session_state.auth_notices = st.session_state.auth_notices[-3:]
-            
-            st.markdown('<div class="auth-form-card">', unsafe_allow_html=True)
-            st.markdown("### Welcome Back")
-            st.markdown('<p style="color: var(--text-tertiary); margin-bottom: 1.5rem;">Sign in to access the steganography lab</p>', unsafe_allow_html=True)
-            
-            with st.form("login_form", clear_on_submit=False):
-                username = st.text_input(
-                    "👤 Username",
-                    placeholder="Enter your username",
-                    key="login_username"
-                )
-                password = st.text_input(
-                    "🔒 Password",
-                    type="password",
-                    placeholder="Enter your password",
-                    key="login_password"
-                )
-                
-                submit_login = st.form_submit_button(
-                    "🚀 Login",
-                    use_container_width=True,
-                    type="primary"
-                )
+    with tab1:
+        if st.session_state.auth_notices:
+            for msg, success in st.session_state.auth_notices[-1:]:
+                msg_class = "success" if success else "error"
+                st.markdown(f"""
+                    <div class="auth-message {msg_class}">
+                        <span class="status-dot"></span>
+                        <div>{msg}</div>
+                    </div>
+                """, unsafe_allow_html=True)
+            st.session_state.auth_notices = st.session_state.auth_notices[-3:]
 
-                if submit_login:
-                    if not username or not password:
-                        _notify("Please fill in all fields", success=False)
+        with st.form("login_form", clear_on_submit=False):
+            st.markdown("#### Welcome Back")
+            st.markdown('<p class="help-text">Sign in to access your personalized steganography lab.</p>', unsafe_allow_html=True)
+            username = st.text_input(
+                "Username",
+                placeholder="Enter your username",
+                key="login_username"
+            )
+            password = st.text_input(
+                "Password",
+                type="password",
+                placeholder="Enter your password",
+                key="login_password"
+            )
+
+            submit_login = st.form_submit_button(
+                "Login",
+                use_container_width=True,
+                type="primary"
+            )
+
+            if submit_login:
+                if not username or not password:
+                    _notify("Please fill in all fields.", success=False)
+                else:
+                    ok, msg = authenticate_user(username, password)
+                    if ok:
+                        st.session_state.authenticated = True
+                        st.session_state.username = username
+                        _notify(f"Welcome back, {username}.", success=True)
+                        st.rerun()
                     else:
-                        ok, msg = authenticate_user(username, password)
-                        if ok:
-                            st.session_state.authenticated = True
-                            st.session_state.username = username
-                            _notify(f"Welcome back, {username}!", success=True)
-                            st.rerun()
-                        else:
-                            _notify(msg, success=False)
-            
-            st.markdown('</div>', unsafe_allow_html=True)
+                        _notify(msg, success=False)
 
-        # Register Tab
-        with tab2:
-            # Display notifications
-            if st.session_state.auth_notices:
-                for msg, success, icon in st.session_state.auth_notices[-1:]:  # Show only latest
-                    msg_class = "success" if success else "error"
-                    st.markdown(f"""
-                        <div class="auth-message {msg_class}">
-                            <strong>{icon}</strong> {msg}
-                        </div>
-                    """, unsafe_allow_html=True)
-                # Keep only the latest 3 notifications
-                st.session_state.auth_notices = st.session_state.auth_notices[-3:]
-            
-            st.markdown('<div class="auth-form-card">', unsafe_allow_html=True)
-            st.markdown("### Create Account")
-            st.markdown('<p style="color: var(--text-tertiary); margin-bottom: 1.5rem;">Join StegAnalyzer and start analyzing</p>', unsafe_allow_html=True)
-            
-            with st.form("register_form", clear_on_submit=False):
-                reg_username = st.text_input(
-                    "👤 Username",
-                    placeholder="3+ characters, letters and numbers only",
-                    key="reg_username"
-                )
-                reg_email = st.text_input(
-                    "📧 Email (Optional)",
-                    placeholder="your.email@example.com",
-                    key="reg_email"
-                )
-                reg_password = st.text_input(
-                    "🔒 Password",
-                    type="password",
-                    placeholder="6+ characters",
-                    key="reg_password"
-                )
-                reg_confirm = st.text_input(
-                    "🔒 Confirm Password",
-                    type="password",
-                    placeholder="Re-enter your password",
-                    key="reg_confirm"
-                )
-                
-                submit_register = st.form_submit_button(
-                    "✨ Create Account",
-                    use_container_width=True,
-                    type="primary"
-                )
+    with tab2:
+        if st.session_state.auth_notices:
+            for msg, success in st.session_state.auth_notices[-1:]:
+                msg_class = "success" if success else "error"
+                st.markdown(f"""
+                    <div class="auth-message {msg_class}">
+                        <span class="status-dot"></span>
+                        <div>{msg}</div>
+                    </div>
+                """, unsafe_allow_html=True)
+            st.session_state.auth_notices = st.session_state.auth_notices[-3:]
 
-                if submit_register:
-                    if not reg_username or not reg_password or not reg_confirm:
-                        _notify("Please fill in all required fields", success=False)
-                    elif reg_password != reg_confirm:
-                        _notify("Passwords do not match", success=False)
+        with st.form("register_form", clear_on_submit=False):
+            st.markdown("#### Create Account")
+            st.markdown('<p class="help-text">Provision secure credentials and start encoding in minutes.</p>', unsafe_allow_html=True)
+            reg_username = st.text_input(
+                "Username",
+                placeholder="3+ characters, letters and numbers only",
+                key="reg_username"
+            )
+            reg_email = st.text_input(
+                "Email (optional)",
+                placeholder="your.email@example.com",
+                key="reg_email"
+            )
+            reg_password = st.text_input(
+                "Password",
+                type="password",
+                placeholder="6+ characters",
+                key="reg_password"
+            )
+            reg_confirm = st.text_input(
+                "Confirm password",
+                type="password",
+                placeholder="Re-enter your password",
+                key="reg_confirm"
+            )
+
+            submit_register = st.form_submit_button(
+                "Create Account",
+                use_container_width=True,
+                type="primary"
+            )
+
+            if submit_register:
+                if not reg_username or not reg_password or not reg_confirm:
+                    _notify("Please fill in all required fields.", success=False)
+                elif reg_password != reg_confirm:
+                    _notify("Passwords do not match.", success=False)
+                else:
+                    ok, msg = register_user(reg_username, reg_password, reg_email)
+                    if ok:
+                        _notify("Registration successful. Please log in.", success=True)
+                        st.session_state.auth_page_mode = 'login'
+                        st.rerun()
                     else:
-                        ok, msg = register_user(reg_username, reg_password, reg_email)
-                        if ok:
-                            _notify("Registration successful! Please login.", success=True)
-                            # Switch to login tab after successful registration
-                            st.session_state.auth_page_mode = 'login'
-                            st.rerun()
-                        else:
-                            _notify(msg, success=False)
-            
-            st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Footer
-        st.markdown("""
-            <div class="auth-footer">
-                <p>Universal Steg Analyzer v4.0</p>
-            </div>
-        """, unsafe_allow_html=True)
+                        _notify(msg, success=False)
+
+    st.markdown("""
+        <div class="auth-footer">
+            <p>Universal Steg Analyzer v4.0</p>
+        </div>
+    """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def require_auth(func):
     def wrapper(*args, **kwargs):
