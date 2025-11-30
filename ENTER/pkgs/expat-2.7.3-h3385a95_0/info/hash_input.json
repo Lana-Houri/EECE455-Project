@@ -1,0 +1,13 @@
+{
+  "cxx_compiler": "gxx",
+  "c_stdlib_version": "2.28",
+  "BUILD": "x86_64-conda_el8-linux-gnu",
+  "c_compiler": "gcc",
+  "channel_targets": "defaults",
+  "expat": "2",
+  "cxx_compiler_version": "11.2.0",
+  "c_stdlib": "sysroot",
+  "c_compiler_version": "11.2.0",
+  "target_platform": "linux-64",
+  "__glibc": "__glibc >=2.28,<3.0.a0"
+}

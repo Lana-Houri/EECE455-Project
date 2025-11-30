@@ -1,0 +1,27 @@
+# Core dependencies
+streamlit>=1.40.1
+numpy>=1.24.4
+pandas>=2.0.3
+Pillow>=12.0.0
+
+# Google Gemini API for chatbot (optional - app works without it)
+google-generativeai>=0.3.0
+
+# Deep Learning support (optional - app works without it)
+# Uncomment if you want deep learning detection features
+# torch>=2.0.0
+# torchvision>=0.15.0
+
+# Scientific computing (optional - for DCT analysis fallback)
+scipy>=1.10.0
+
+# JPEG analysis (optional)
+# jpegio>=0.3.0
+
+# LSB steganography library (optional)
+# stegano>=1.10.1
+
+# Text steganography (optional)
+# zwsp-steg-py>=1.0.0
+# pyUnicodeSteganography>=1.0.0
+# confusables>=1.0.0

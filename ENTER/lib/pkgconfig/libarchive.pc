@@ -1,0 +1,13 @@
+prefix=/home/amarus/ver4/steg_app_modular/ENTER
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libarchive
+Description: library that can create and read several streaming archive formats
+Version: 3.8.2
+Cflags: -I${includedir}
+Cflags.private: -DLIBARCHIVE_STATIC
+Libs: -L${libdir} -larchive
+Libs.private:  -lz -lbz2 -llzma -llz4 -lzstd -lcrypto -lxml2 -lssl -L/home/amarus/ver4/steg_app_modular/ENTER/lib -lxml2 -L/home/amarus/ver4/steg_app_modular/ENTER/lib -lz -L/home/amarus/ver4/steg_app_modular/ENTER/lib -llzma -L/home/amarus/ver4/steg_app_modular/ENTER/lib -lm -licui18n -L/home/amarus/ver4/steg_app_modular/ENTER/lib -licuuc -licudata -lpthread -ldl -lm
+Requires.private: 

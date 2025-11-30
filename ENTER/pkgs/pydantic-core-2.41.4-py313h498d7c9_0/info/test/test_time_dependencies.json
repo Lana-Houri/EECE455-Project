@@ -1,0 +1,1 @@
+["pip", "pytest-benchmark", "pytest-mock", "pytest", "hypothesis", "typing-inspection", "dirty-equals", "pytest-timeout"]
